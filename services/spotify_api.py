@@ -1,35 +1,28 @@
 import os
 from dotenv import load_dotenv
-
-load_dotenv()  # this loads .env variables into os.environ
-
-import spotipy
+from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
+# Load environment variables from .env
+load_dotenv()
+
 sp_oauth = SpotifyOAuth(
-    client_id=os.getenv("SPOTIFY_CLIENT_ID"),
+    client_id=os.getenv("SPOTIFY_CLIENT_ID"),        # matches your .env
     client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
     redirect_uri=os.getenv("SPOTIFY_REDIRECT_URI"),
     scope="user-read-recently-played",
-    show_dialog=True
+    cache_path=".cache"
 )
 
-# Step 1: get auth URL
-auth_url = sp_oauth.get_authorize_url()
-print("Go here and authorize:", auth_url)
+sp = Spotify(auth_manager=sp_oauth)
 
-# Step 2: paste the URL Spotify redirects you to
-response = input("Paste the full URL you were redirected to: ")
+def get_recent_songs(limit=3):
+    # Mock data for testing
+    return [
+        {"title": "Shape of You", "artist": "Ed Sheeran"},
+        {"title": "Blinding Lights", "artist": "The Weeknd"},
+        {"title": "Thriller", "artist": "Michael Jackson"}
+    ]
 
-# Step 3: parse code and get token
-code = sp_oauth.parse_response_code(response)
-token_info = sp_oauth.get_access_token(code)
 
-# Step 4: create Spotify client
-sp = spotipy.Spotify(auth=token_info['access_token'])
 
-# Example: get last 3 songs
-results = sp.current_user_recently_played(limit=3)
-for item in results['items']:
-    track = item['track']
-    print(track['name'], "by", track['artists'][0]['name'])
