@@ -14,6 +14,7 @@ def get_recent_songs():
 ))
 
 
+
     results = sp.current_user_recently_played(limit=3)
 
     songs = []
