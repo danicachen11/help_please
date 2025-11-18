@@ -7,11 +7,12 @@ load_dotenv()
 
 def get_recent_songs():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-        client_id=os.getenv("SPOTIFY_CLIENT_ID"),
-        client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
-        redirect_uri="http://localhost:5000/callback",
-        scope="user-read-recently-played"
-    ))
+    client_id=os.getenv("SPOTIFY_CLIENT_ID"),
+    client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
+    redirect_uri="http://127.0.0.1:9999/callback",
+    scope="user-read-recently-played"
+))
+
 
     results = sp.current_user_recently_played(limit=3)
 
