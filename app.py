@@ -1,29 +1,38 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from services.spotify_api import get_recent_songs
-from services.song_to_movie import feature_to_movie_keyword
-from services.omdb_api import search_movies_by_keyword
+from services.tastedive_api import get_similar_movies
+from services.omdb_api import get_movie_details
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
-
-@app.route("/recommend")
-def recommend():
-    songs = get_recent_songs()  # last 3 songs
     recommendations = []
 
-    for song in songs:
-        keyword = feature_to_movie_keyword(song)
-        movies = search_movies_by_keyword(keyword)
-        recommendations.append({
-            "song": song["name"],
-            "artist": song["artist"],
-            "movies": movies
-        })
+    if request.method == "POST":
+        # Get 3 recent songs from Spotify
+        songs = get_recent_songs()
 
-    return render_template("results.html", recommendations=recommendations)
+        for song in songs:
+            title = song["title"]
+            artist = song["artist"]
+
+            # TasteDive → get similar movies
+            movies = get_similar_movies(f"{title} {artist}")
+
+            movie_details = []
+            for movie in movies:
+                details = get_movie_details(movie)
+                if details:
+                    movie_details.append(details)
+
+            recommendations.append({
+                "song": title,
+                "artist": artist,
+                "movies": movie_details
+            })
+
+    return render_template("index.html", recommendations=recommendations)
 
 if __name__ == "__main__":
     app.run(debug=True)

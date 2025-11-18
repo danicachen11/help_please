@@ -1,14 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Song to Movie Recommender</title>
+    <title>Song → Movie Recommender</title>
 </head>
 <body>
-    <h1>Enter a Song</h1>
-    <form action="/recommend" method="post">
-        <input type="text" name="song" placeholder="Song Title" required>
-        <button type="submit">Recommend Movies</button>
-    </form>
+
+<h1>Song → Movie Recommender</h1>
+
+<form method="POST">
+    <button type="submit">Get Movie Recommendations</button>
+</form>
+
+{% for rec in recommendations %}
+    <h2>{{ rec.song }} by {{ rec.artist }}</h2>
+
+    {% for movie in rec.movies %}
+        <p>
+            <strong>{{ movie.title }} ({{ movie.year }})</strong><br>
+            {{ movie.plot }}<br>
+            {% if movie.poster %}
+            <img src="{{ movie.poster }}" width="120">
+            {% endif %}
+        </p>
+        <hr>
+    {% endfor %}
+{% endfor %}
+
 </body>
 </html>
+
 

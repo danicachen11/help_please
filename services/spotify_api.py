@@ -1,26 +1,26 @@
 import os
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 
 load_dotenv()
 
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+def get_recent_songs():
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+        client_id=os.getenv("SPOTIFY_CLIENT_ID"),
+        client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
+        redirect_uri="http://localhost:5000/callback",
+        scope="user-read-recently-played"
+    ))
 
-sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
-    client_id=SPOTIFY_CLIENT_ID,
-    client_secret=SPOTIFY_CLIENT_SECRET
-))
+    results = sp.current_user_recently_played(limit=3)
 
-def get_recent_songs(user_id=None, limit=3):
-    """
-    Returns a list of recent song dictionaries with name, artist, and features.
-    """
-    # For simplicity, here we can hardcode popular songs if no user auth:
-    songs = [
-        {"name": "Shape of You", "artist": "Ed Sheeran", "energy": 0.8, "valence": 0.9},
-        {"name": "Blinding Lights", "artist": "The Weeknd", "energy": 0.9, "valence": 0.8},
-        {"name": "Rolling in the Deep", "artist": "Adele", "energy": 0.7, "valence": 0.4}
-    ]
+    songs = []
+    for item in results["items"]:
+        track = item["track"]
+        songs.append({
+            "title": track["name"],
+            "artist": track["artists"][0]["name"]
+        })
+
     return songs
