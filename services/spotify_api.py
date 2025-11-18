@@ -1,28 +1,31 @@
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
 
-load_dotenv()
-
-def get_recent_songs():
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+sp_oauth = SpotifyOAuth(
     client_id=os.getenv("SPOTIFY_CLIENT_ID"),
     client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
-    redirect_uri="http://127.0.0.1:9999/callback",
-    scope="user-read-recently-played"
-))
+    redirect_uri="http://localhost/",  # dummy, not actually used
+    scope="user-read-recently-played",
+    show_dialog=True
+)
 
+# Step 1: get auth URL
+auth_url = sp_oauth.get_authorize_url()
+print("Go here and authorize:", auth_url)
 
+# Step 2: paste the URL Spotify redirects you to
+response = input("Paste the full URL you were redirected to: ")
 
-    results = sp.current_user_recently_played(limit=3)
+# Step 3: parse code and get token
+code = sp_oauth.parse_response_code(response)
+token_info = sp_oauth.get_access_token(code)
 
-    songs = []
-    for item in results["items"]:
-        track = item["track"]
-        songs.append({
-            "title": track["name"],
-            "artist": track["artists"][0]["name"]
-        })
+# Step 4: create Spotify client
+sp = spotipy.Spotify(auth=token_info['access_token'])
 
-    return songs
+# Example: get last 3 songs
+results = sp.current_user_recently_played(limit=3)
+for item in results['items']:
+    track = item['track']
+    print(track['name'], "by", track['artists'][0]['name'])
