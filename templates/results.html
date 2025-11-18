@@ -1,22 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Recommendations</title>
-</head>
-<body>
-    <h1>Song Info</h1>
-    <img src="{{ song.cover }}" width="200">
-    <p><strong>{{ song.name }}</strong> by {{ song.artist }}</p>
-
-    <h2>Movie Recommendations</h2>
-    {% for movie in movies %}
-        <div>
-            <img src="{{ movie.poster }}" width="120">
-            <h3>{{ movie.title }} ({{ movie.year }})</h3>
-            <p>{{ movie.plot }}</p>
-        </div>
-        <hr>
+{% for rec in recommendations %}
+<h3>{{ rec.song }} by {{ rec.artist }}</h3>
+<ul>
+    {% for movie in rec.movies %}
+    <li>
+        <strong>{{ movie.title }} ({{ movie.year }})</strong><br>
+        {{ movie.plot }}<br>
+        {% if movie.poster %}<img src="{{ movie.poster }}" width="100">{% endif %}
+    </li>
     {% endfor %}
-</body>
-</html>
+</ul>
+{% endfor %}
 

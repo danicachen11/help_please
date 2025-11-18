@@ -1,41 +1,26 @@
-import requests
-import base64
 import os
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 
 load_dotenv()
 
-client_id = os.getenv("SPOTIFY_CLIENT_ID")
-client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
-# Get access token
-def get_spotify_token():
-    auth_string = f"{client_id}:{client_secret}"
-    b64 = base64.b64encode(auth_string.encode()).decode()
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
+    client_id=SPOTIFY_CLIENT_ID,
+    client_secret=SPOTIFY_CLIENT_SECRET
+))
 
-    url = "https://accounts.spotify.com/api/token"
-    headers = {"Authorization": f"Basic {b64}"}
-    data = {"grant_type": "client_credentials"}
-
-    r = requests.post(url, headers=headers, data=data)
-    return r.json()["access_token"]
-
-def get_song_info(song_name):
-    token = get_spotify_token()
-    headers = {"Authorization": f"Bearer {token}"}
-
-    search_url = "https://api.spotify.com/v1/search"
-    params = {"q": song_name, "type": "track", "limit": 1}
-
-    r = requests.get(search_url, headers=headers, params=params)
-    result = r.json()["tracks"]["items"][0]
-
-    song = {
-        "name": result["name"],
-        "artist": result["artists"][0]["name"],
-        "album": result["album"]["name"],
-        "cover": result["album"]["images"][0]["url"]
-    }
-
-    return song
-
+def get_recent_songs(user_id=None, limit=3):
+    """
+    Returns a list of recent song dictionaries with name, artist, and features.
+    """
+    # For simplicity, here we can hardcode popular songs if no user auth:
+    songs = [
+        {"name": "Shape of You", "artist": "Ed Sheeran", "energy": 0.8, "valence": 0.9},
+        {"name": "Blinding Lights", "artist": "The Weeknd", "energy": 0.9, "valence": 0.8},
+        {"name": "Rolling in the Deep", "artist": "Adele", "energy": 0.7, "valence": 0.4}
+    ]
+    return songs
