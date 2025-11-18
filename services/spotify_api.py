@@ -1,11 +1,15 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # this loads .env variables into os.environ
+
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 sp_oauth = SpotifyOAuth(
     client_id=os.getenv("SPOTIFY_CLIENT_ID"),
     client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
-    redirect_uri="http://localhost/",  # dummy, not actually used
+    redirect_uri=os.getenv("SPOTIFY_REDIRECT_URI"),
     scope="user-read-recently-played",
     show_dialog=True
 )
